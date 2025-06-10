@@ -13,11 +13,25 @@ const defaultState = {
   comments
 };
 
+const enhancers = compose(
+  // If you use the Redux DevTools extension, this will enable it
+  window.devToolsExtension ? window.devToolsExtension() : f => f,
+);
+
 // Create the store with the default state
 const store = createStore(
   rootReducer,
-  defaultState)
+  defaultState,
+enhancers)
 
 export const history = syncHistoryWithStore(browserHistory, store);
+
+if(module.hot) {
+  // Enable Webpack hot module replacement for reducers
+  module.hot.accept('./reducers', () => {
+    const nextRootReducer = require('./reducers/index').default;
+    store.replaceReducer(nextRootReducer);
+  });
+}
 
 export default store;
